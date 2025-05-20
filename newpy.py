@@ -2,7 +2,7 @@ import turtle
 import time
 import random
 
-delay = 0.1
+delay = 0.2
 
 wn = turtle.Screen()
 wn.title("Snake Game")
@@ -69,10 +69,13 @@ def move():
         head.setx(x+20) # (20,0)
 
 wn.listen()
-wn.onkeypress(go_up, "w")
-wn.onkeypress(go_down, "s")
-wn.onkeypress(go_left, "a")
-wn.onkeypress(go_right, "d")
+wn.onkeypress(go_up, "Up")
+wn.onkeypress(go_down, "Down")
+wn.onkeypress(go_left, "Left")
+wn.onkeypress(go_right, "Right")
+
+score = 0
+high_score = 0
 
 while True:
     wn.update()
@@ -80,6 +83,56 @@ while True:
         time.sleep(1)
         head.goto(0,0)
         head.direction = "stop"
+        
+        for segment in segments:
+            segment.goto(1000,1000) #out of range
+        #clear the segments
+        segments.clear()
+        
+        
+        #reset score
+        score = 0
+
+        #reset delay
+        delay = 0.1
+        
+
+        sc.clear()
+        sc.write("score: {}  High score: {}".format(score, high_score), align="center", font=("ds-digital", 24, "normal"))
+ 
     move()
+    if head.distance(food) <20:
+        # move the food to random place
+        x = random.randint(-270,270)
+        y = random.randint(-270,270)
+        food.goto(x,y)
+        
+        new_segment = turtle.Turtle()
+        new_segment.speed(0)
+        new_segment.shape("square")
+        new_segment.color("black")
+        new_segment.penup()
+        segments.append(new_segment)
+        
+        
+        delay -= 0.001
+        #increase the score
+        score += 10
+
+        if score > high_score:
+            high_score = score
+        sc.clear()
+        sc.write("score: {}  High score: {}".format(score,high_score), align="center", font=("ds-digital", 24, "normal")) 
+        
+        
+    for index in range(len(segments)-1,0,-1):
+        x = segments[index-1].xcor()
+        y = segments[index-1].ycor()
+        segments[index].goto(x,y)
+    #move segment 0 to head
+    if len(segments)>0:
+        x = head.xcor()
+        y = head.ycor()
+        segments[0].goto(x,y)
     time.sleep(delay)
 
